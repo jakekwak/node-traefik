@@ -5,7 +5,7 @@ services:
     restart: always
     image: traefik:latest
     command:
-      - "--api.insecure=true"
+      - "--api.insecure=false"
       - "--api.dashboard=true"
       - "--api.debug=true"
       - "--providers.docker=true"
@@ -28,6 +28,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`, `traefik.${EXT_ENDPOINT1}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints: websecure"
+      - "traefik.http.routers.dashboard.tls: true"
+      - "traefik.http.routers.dashboard.tls.certResolver: myresolver"
       - "traefik.http.routers.dashboard.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
 
