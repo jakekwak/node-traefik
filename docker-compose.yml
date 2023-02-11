@@ -13,8 +13,8 @@ services:
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--providers.docker.exposedbydefault=false"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+#      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+#      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=jakekwako@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
@@ -26,13 +26,15 @@ services:
       - "./traefik/.htpasswd:/.htpasswd"
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.entrypoints: web"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`, `traefik.${EXT_ENDPOINT1}`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.entrypoints: websecure"
-      - "traefik.http.routers.dashboard.tls: true"
-      - "traefik.http.routers.dashboard.tls.certResolver: myresolver"
-      - "traefik.http.routers.dashboard.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.routers.dashboard-secure.entrypoints=websecure"
+      - "traefik.http.routers.dashboard-secure.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`, `traefik.${EXT_ENDPOINT1}`)"
+      - "traefik.http.routers.dashboard-secure.tls: true"
+      - "traefik.http.routers.dashboard-secure.tls.certresolver: myresolver"
+#      - "traefik.http.routers.dashboard.service=api@internal"
 
   node-server:
     container_name: node-server
