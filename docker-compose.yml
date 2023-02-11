@@ -35,7 +35,7 @@ services:
     container_name: node-server
     restart: always
     build:
-      context: .
+      context: ./sveltekit
       dockerfile: Dockerfile
     labels:
       - "traefik.enable=true"
