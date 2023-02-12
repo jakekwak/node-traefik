@@ -15,4 +15,5 @@ RUN cd /home/kit && pnpm install
 WORKDIR /home/kit/sites/kit.svelte.dev
 RUN pnpm install && pnpm build
 EXPOSE 4173
-CMD [ "pnpm", "preview", "--host", "0.0.0.0"]
+# CMD [ "pnpm", "preview", "--host", "0.0.0.0"]
+CMD [ "pnpm", "preview", "--host"]
