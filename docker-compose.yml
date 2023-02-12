@@ -1,52 +1,55 @@
-version: "3.3"
+version: "3.8"
 services:
   reverse-proxy:
-    container_name: "traefik"
-    restart: always
-    image: traefik:latest
+    image: traefik:v3.0
+    container_name: "traefik3"
     command:
       - "--api.insecure=false"
       - "--api.dashboard=true"
-      - "--api.debug=true"
       - "--providers.docker=true"
+      - "--api.debug=true"
       - "--log.LEVEL=DEBUG"
+      - "--log.filepath=/letsencrypt/access.log"
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--providers.docker.exposedbydefault=false"
-#      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-#      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=jakekwako@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=jakekwak@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "443:443"
       - "80:80"
+#      - "8080:8080"
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik/.htpasswd:/.htpasswd"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.entrypoints: web"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`, `traefik.${EXT_ENDPOINT1}`)"
-      - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.javapad.com`, `traefik.localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
       - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.routers.dashboard-secure.entrypoints=websecure"
-      - "traefik.http.routers.dashboard-secure.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`, `traefik.${EXT_ENDPOINT1}`)"
-      - "traefik.http.routers.dashboard-secure.tls: true"
-      - "traefik.http.routers.dashboard-secure.tls.certresolver: myresolver"
-#      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.middlewares.auth.basicauth.users=user:$$apr1$$q8eZFHjF$$Fvmkk//V6Btlaf2i/ju5n/" ## user/password
+      ## middleware redirect
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      ## global redirect to https
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
 
-  node-server:
-    container_name: node-server
-    restart: always
+  sveltekit:
     build:
-      context: ./sveltekit
+      context: ./svletekit
       dockerfile: Dockerfile
+    container_name: sveltekit
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.node-server.rule=Host(`sveltekit.${LOCAL_1}`, `sveltekit.${LOCAL_2}`, `sveltekit.${EXT_ENDPOINT1}`)"
-      - "traefik.http.routers.node-server.entrypoints=websecure"
-      - "traefik.http.routers.node-server.tls.certresolver=myresolver"
+      - "traefik.http.routers.sveltekit.rule=Host(`sveltekit.javapad.com`, `sveltekit.localhost`)"
+      - "traefik.http.routers.sveltekit.entrypoints=websecure"
+      - "traefik.http.routers.sveltekit.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
