@@ -26,7 +26,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.javapad.com`, `traefik.localhost`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.javapad.com`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls=true"
@@ -40,16 +40,16 @@ services:
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
 
-  sveltekit:
+  node-server:
     build:
-      context: ./svletekit
+      context: ./sveltekit
       dockerfile: Dockerfile
-    container_name: sveltekit
+    container_name: node-server
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.sveltekit.rule=Host(`sveltekit.javapad.com`, `sveltekit.localhost`)"
-      - "traefik.http.routers.sveltekit.entrypoints=websecure"
-      - "traefik.http.routers.sveltekit.tls.certresolver=myresolver"
+      - "traefik.http.routers.node-server.rule=Host(`sveltekit.javapad.com`)"
+      - "traefik.http.routers.node-server.entrypoints=websecure"
+      - "traefik.http.routers.node-server.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
