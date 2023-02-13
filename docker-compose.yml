@@ -55,3 +55,18 @@ services:
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+
+  node-server1:
+    build:
+      context: ./learnsvelte
+      dockerfile: Dockerfile
+    container_name: node-server1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.node-server1.rule=Host(`learn.javapad.com`)"
+      - "traefik.http.routers.node-server1.entrypoints=websecure"
+      - "traefik.http.routers.node-server1.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
