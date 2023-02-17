@@ -1,6 +1,6 @@
 const fastify = require("fastify")({ logger: true });
 fastify.get("/", async (request, reply) => {
-  return { message: "Hello world! I'm Node-SERVER(sveltekit)" };
+  return { message: "Hello world! I'm Node-SERVER1(learn-svelte)" };
 });
 const start = async () => {
   try {

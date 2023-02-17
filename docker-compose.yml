@@ -6,13 +6,16 @@ services:
     command:
       - "--api.insecure=false"
       - "--api.dashboard=true"
-      - "--providers.docker=true"
+      # 디버깅
       - "--api.debug=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # 디버깅
       - "--log.LEVEL=DEBUG"
       - "--log.filepath=/letsencrypt/access.log"
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
-      - "--providers.docker.exposedbydefault=false"
+      # acme.json에 myresolver 가 이름으로...
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.myresolver.acme.email=jakekwak@gmail.com"
@@ -26,7 +29,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.javapad.com`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`, `traefik.javapad.com`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls=true"
@@ -48,7 +51,7 @@ services:
     container_name: node-server
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.node-server.rule=Host(`sveltekit.javapad.com`)"
+      - "traefik.http.routers.node-server.rule=Host(`sveltekit.localhost`, `sveltekit.javapad.com`)"
       - "traefik.http.routers.node-server.entrypoints=websecure"
       - "traefik.http.routers.node-server.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -63,7 +66,7 @@ services:
     container_name: node-server1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.node-server1.rule=Host(`learn.javapad.com`)"
+      - "traefik.http.routers.node-server1.rule=Host(`learn.localhost`, `learn.javapad.com`)"
       - "traefik.http.routers.node-server1.entrypoints=websecure"
       - "traefik.http.routers.node-server1.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
