@@ -48,7 +48,7 @@ services:
     image: mariadb:latest
     restart: always
     container_name: mariadb
-    env_file: ".env"
+    # env_file: ".env"
     volumes:
       - ./mariadb/data:/var/lib/mysql/data
       - ./mariadb/logs:/var/lib/mysql/logs
@@ -77,7 +77,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root1234
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpmyadmin_local.rule=Host(`phpmyadmin.localhost, `phpmyadmin.javapad.com`)"
+      - "traefik.http.routers.phpmyadmin_local.rule=Host(`pma.localhost, `pma.javapad.com`)"
       - "traefik.http.routers.phpmyadmin_local.entrypoints=websecure"
       - "traefik.http.routers.phpmyadmin_local.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -93,7 +93,7 @@ services:
     container_name: node-server
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.node-server.rule=Host(`sveltekit.localhost`, `sveltekit.javapad.com`)"
+      - "traefik.http.routers.node-server.rule=Host(`node0.localhost`, `node0.javapad.com`)"
       - "traefik.http.routers.node-server.entrypoints=websecure"
       - "traefik.http.routers.node-server.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -108,7 +108,7 @@ services:
     container_name: node-server1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.node-server1.rule=Host(`learn.localhost`, `learn.javapad.com`)"
+      - "traefik.http.routers.node-server1.rule=Host(`node1.localhost`, `node1.javapad.com`)"
       - "traefik.http.routers.node-server1.entrypoints=websecure"
       - "traefik.http.routers.node-server1.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
