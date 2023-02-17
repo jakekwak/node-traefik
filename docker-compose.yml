@@ -29,7 +29,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`, `traefik.javapad.com`)"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.javapad.com`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.routers.dashboard.tls=true"
@@ -43,6 +43,30 @@ services:
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+
+  nginx_server:
+    container_name: nginx_server
+    restart: unless-stopped
+    logging:
+      driver: none
+    image: "nginx:latest"
+    expose:
+      - 8080
+    volumes:
+      - ./www:/code/static
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/app.nginx.template:/etc/nginx/templates/app.nginx.template
+      - "${EB_LOG_BASE_DIR:-./nginx-config-files}/nginx-proxy:/var/log/nginx"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx_local.rule=Host(`www.javapad.com`, `javapad.com`)"
+      - "traefik.http.routers.nginx_local.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin_local.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+      - "traefik.http.services.nginx_local_service.loadbalancer.server.port=8080"
 
   mariadb:
     image: mariadb:latest
