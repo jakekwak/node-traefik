@@ -44,6 +44,48 @@ services:
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
 
+  mariadb:
+    image: mariadb:latest
+    restart: always
+    container_name: mariadb
+    env_file: ".env"
+    volumes:
+      - ./mariadb/data:/var/lib/mysql/data
+      - ./mariadb/logs:/var/lib/mysql/logs
+    expose:
+      - 3306
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=database
+      - MYSQL_ROOT_PASSWORD=root1234
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: always
+    container_name: phpmyadmin
+    # ports:
+    #   - 8090:80
+    expose:
+      - 8090
+    depends_on:
+      - mariadb
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+      - MYSQL_ROOT_PASSWORD=root1234
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin_local.rule=Host(`phpmyadmin.localhost, `phpmyadmin.javapad.com`)"
+      - "traefik.http.routers.phpmyadmin_local.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin_local.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.redirs.entrypoints=web"
+      - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+
+
   node-server:
     build:
       context: ./sveltekit
