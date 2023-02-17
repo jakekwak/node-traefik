@@ -61,7 +61,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.nginx_local.rule=Host(`www.javapad.com`, `javapad.com`)"
       - "traefik.http.routers.nginx_local.entrypoints=websecure"
-      - "traefik.http.routers.phpmyadmin_local.tls.certresolver=myresolver"
+      - "traefik.http.routers.nginx_local.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
