@@ -50,13 +50,14 @@ services:
     logging:
       driver: none
     image: "nginx:latest"
+    depends_on:
+      - php-fpm
     expose:
       - 8080
     volumes:
       - ./htdocs:/code/static
-      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./services/nginx/app.nginx.template:/etc/nginx/templates/app.nginx.template
-      - "${EB_LOG_BASE_DIR:-./nginx-config-files}/nginx-proxy:/var/log/nginx"
+      - ./services/nginx/conf.d/:/etc/nginx/conf.d/:ro,cached
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,cached
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nginx_local.rule=Host(`www.javapad.com`, `javapad.com`)"
@@ -67,6 +68,19 @@ services:
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
       # - "traefik.http.services.nginx_local_service.loadbalancer.server.port=8080"
+
+  php-fpm:
+    build: ./services/php/${PHP_VERSION}
+    # image: php:${PHP_VERSION}-fpm
+    restart: always
+    depends_on:
+      - ${MYSQL_HOST}
+    volumes:
+      - ./htdocs:/var/www/html
+      - ./services/php/${PHP_VERSION}/php.ini:/usr/local/etc/php/php.ini
+    env_file: .env
+    networks:
+      - app-network
 
   mariadb:
     image: mariadb:latest
