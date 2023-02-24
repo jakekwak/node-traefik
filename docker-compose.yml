@@ -79,8 +79,6 @@ services:
       - ./htdocs:/var/www/html
       - ./services/php/${PHP_VERSION}/php.ini:/usr/local/etc/php/php.ini
     env_file: .env
-    networks:
-      - app-network
 
   mariadb:
     image: mariadb:latest
