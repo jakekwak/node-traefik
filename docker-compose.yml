@@ -60,7 +60,7 @@ services:
       - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro,cached
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx_local.rule=Host(`www.javapad.com`, `javapad.com`)"
+      - "traefik.http.routers.nginx_local.rule=Host(`www.javapad.com`, `javapad.com`) || Host(`demo.javapad.com`)"
       - "traefik.http.routers.nginx_local.entrypoints=websecure"
       - "traefik.http.routers.nginx_local.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
