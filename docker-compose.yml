@@ -73,6 +73,8 @@ services:
     build: ./services/php/${PHP_VERSION}
     # image: php:${PHP_VERSION}-fpm
     restart: always
+    expose:
+      - 9000
     depends_on:
       - ${MYSQL_HOST}
     volumes:
